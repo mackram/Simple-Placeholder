@@ -6,7 +6,7 @@
 (function($) {
   $.simplePlaceholder = {
     placeholderClass: null,
-
+		counter: 0,
     hidePlaceholder: function(){
       var $this = $(this);
       if($this.val() == $this.attr('placeholder')){
@@ -43,11 +43,31 @@
 
       this.each(function() {
         var $this = $(this);
-        $this.focus($.simplePlaceholder.hidePlaceholder);
-        $this.blur($.simplePlaceholder.showPlaceholder);
-        if($this.val() == '') {
-          $this.val($this.attr("placeholder"));
-          $this.addClass($.simplePlaceholder.placeholderClass);
+        if($this.attr('type') == 'password'){
+        	var password = "password-field-" + $.simplePlaceholder.counter;
+        	$.simplePlaceholder.counter++;
+        	$(this).hide().before('<input type="text" id="' + password + '"/>');
+        	$('#' + password).addClass($.simplePlaceholder.placeholderClass);
+        	if ($(this).attr('tabindex')) {
+						$('#' + password).attr('tabindex',$(this).attr('tabindex'));
+					}
+        	$("#"+password).bind('focus',function(){	
+        		$this.show().val('').focus();
+						$(this).hide();
+					});
+        	$this.bind('blur',function(){	
+        		if (!$this.val()){
+							$this.hide();
+							$('#' + password).show();
+						}
+					});        	
+        }else{
+        	$this.focus($.simplePlaceholder.hidePlaceholder);
+        	$this.blur($.simplePlaceholder.showPlaceholder);
+        	if($this.val() == '') {
+        	  $this.val($this.attr("placeholder"));
+        	  $this.addClass($.simplePlaceholder.placeholderClass);
+        	}
         }
         $this.addClass("simple-placeholder");
         $(this.form).submit($.simplePlaceholder.preventPlaceholderSubmit);
